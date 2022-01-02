@@ -46,6 +46,12 @@ class _HomeScreensState extends State<HomeScreens>
 //?Show  Snack Bar
   createASnackBar(BuildContext context) {
     var snackBar = const SnackBar(
+      elevation: 0.0,
+      duration: Duration(seconds: 3),
+
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.grey,
+
       content: Text(" This is a Dummy Snack Bar for Practice"),
       // animation: animation,
     );
@@ -88,6 +94,43 @@ class _HomeScreensState extends State<HomeScreens>
         isLoading = false;
       });
     });
+  }
+
+//!HighLight Search word
+  List<TextSpan> highlightOccurrences(String source, String query) {
+    if (query == null ||
+        query.isEmpty ||
+        !source.toLowerCase().contains(query.toLowerCase())) {
+      return [TextSpan(text: source)];
+    }
+    final matches = query.toLowerCase().allMatches(source.toLowerCase());
+
+    int lastMatchEnd = 0;
+
+    final List<TextSpan> children = [];
+    for (var i = 0; i < matches.length; i++) {
+      final match = matches.elementAt(i);
+
+      if (match.start != lastMatchEnd) {
+        children.add(TextSpan(
+          text: source.substring(lastMatchEnd, match.start),
+        ));
+      }
+
+      children.add(TextSpan(
+        text: source.substring(match.start, match.end),
+        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+      ));
+
+      if (i == matches.length - 1 && match.end != source.length) {
+        children.add(TextSpan(
+          text: source.substring(match.end, source.length),
+        ));
+      }
+
+      lastMatchEnd = match.end;
+    }
+    return children;
   }
 
   @override
@@ -146,22 +189,36 @@ class _HomeScreensState extends State<HomeScreens>
                             controller: scrollController,
                             itemCount: data.length,
                             itemBuilder: (context, index) {
-                              return Container(
-                                height: 100,
-                                child: Card(
-                                  child: ListTile(
-                                    leading: CircleAvatar(
-                                        child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(20),
-                                      child: Image.network(
-                                        "${data[index].avatar}",
-                                        fit: BoxFit.fitHeight,
-                                        height: 200,
+                              return GestureDetector(
+                                onTap: () {
+                                  print(
+                                      "TappedUser Is=>>${data[index].firstName.toString()}");
+                                },
+                                child: Container(
+                                  height: 100,
+                                  child: Card(
+                                    child: ListTile(
+                                      leading: CircleAvatar(
+                                          child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: Image.network(
+                                          "${data[index].avatar}",
+                                          fit: BoxFit.fitHeight,
+                                          height: 200,
+                                        ),
+                                      )),
+                                      title: RichText(
+                                        text: TextSpan(
+                                          children: highlightOccurrences(
+                                              data[index].firstName.toString(),
+                                              controller.text),
+                                          style: TextStyle(color: Colors.grey),
+                                        ),
                                       ),
-                                    )),
-                                    title: Text(
-                                        "${data[index].firstName} ${data[index].lastName}"),
-                                    subtitle: Text("${data[index].email}"),
+                                      // title: Text(
+                                      //     "${data[index].firstName} ${data[index].lastName}"),
+                                      subtitle: Text("${data[index].email}"),
+                                    ),
                                   ),
                                 ),
                               );
@@ -180,9 +237,11 @@ class _HomeScreensState extends State<HomeScreens>
                 const SizedBox(height: 15),
                 ElevatedButton(
                     onPressed: () {
-                      var name;
+                      var name, emails;
                       name = data.map((e) => e.firstName).toList();
-                      print("userName is==>>$name");
+                      emails = data.map((e) => e.email).toList();
+                      print("userNames is==>>$name");
+                      print("userEmails is==>>$emails");
                       // return createASnackBar(context);
                     },
                     child: const Text("show snackBar"))

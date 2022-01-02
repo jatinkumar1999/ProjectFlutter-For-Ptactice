@@ -24,7 +24,7 @@ class _HomeScreensState extends State<HomeScreens>
   int? totalPage;
   List<Data> data = [];
   List<Data> dumyUsersList = [];
-  late Animation<double> animation;
+  Animation<double>? animation;
   late AnimationController animationController;
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -53,7 +53,7 @@ class _HomeScreensState extends State<HomeScreens>
     // scaffoldKey.currentState?.showSnackBar(snackBar);
   }
 
-  //!search Data via TextField
+  //!filter Users List
   searchViaData(String search) {
     //*Create a empty Data List
     List<Data> result = [];
@@ -108,7 +108,7 @@ class _HomeScreensState extends State<HomeScreens>
               searchViaData(value);
             });
           },
-          decoration: const InputDecoration(hintText: "Search your Query....."),
+          decoration: const InputDecoration(hintText: "Search here..."),
         ),
       ),
       body: isLoading
@@ -179,7 +179,12 @@ class _HomeScreensState extends State<HomeScreens>
                 ),
                 const SizedBox(height: 15),
                 ElevatedButton(
-                    onPressed: () => createASnackBar(context),
+                    onPressed: () {
+                      var name;
+                      name = data.map((e) => e.firstName).toList();
+                      print("userName is==>>$name");
+                      // return createASnackBar(context);
+                    },
                     child: const Text("show snackBar"))
               ],
             ),
